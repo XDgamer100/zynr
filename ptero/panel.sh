@@ -14,16 +14,15 @@ install_dependencies() {
     nginx ufw openssl cron logrotate
 
   if ! php -v 2>/dev/null | grep -qE "8\.(1|2|3)"; then
-    step "Adding PHP repository (Ondrej Sury) for ${OS} ${OS_VER}"
+    # Ubuntu 22.04/24.04: use Ondrej PPA (add-apt-repository method, reliable)
+    # Debian 12/13: use packages.sury.org direct repo
     mkdir -p /etc/apt/keyrings
     if [[ "$OS" == "ubuntu" ]]; then
-      # Ubuntu: use official Sury PPA via signed key (no add-apt-repository needed)
-      curl -fsSL https://packages.sury.org/php/apt.gpg \
-        | gpg --dearmor -o /etc/apt/keyrings/sury-php.gpg
-      echo "deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${OS_CODENAME} main" \
-        > /etc/apt/sources.list.d/sury-php.list
+      step "Adding PHP PPA (ondrej/php) for Ubuntu ${OS_VER}"
+      apt-get install -y software-properties-common 2>/dev/null || true
+      LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     else
-      # Debian 12/13: direct Sury repo
+      step "Adding PHP repository (Sury) for Debian ${OS_VER}"
       curl -fsSL https://packages.sury.org/php/apt.gpg \
         | gpg --dearmor -o /etc/apt/keyrings/sury-php.gpg
       echo "deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${OS_CODENAME} main" \
