@@ -291,7 +291,6 @@ detect_os() {
     OS_CODENAME=$(grep -oE '(jammy|noble|bookworm|trixie|focal|bullseye|buster)' /etc/os-release | head -1)
     [[ -z "$OS_CODENAME" ]] && error "Unable to detect OS codename."
   fi
-  fi
   if [[ -z "$OS_CODENAME" ]]; then
     # Last resort: known version-to-codename map
     case "${OS_VER:-}" in
