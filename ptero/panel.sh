@@ -14,21 +14,26 @@ install_dependencies() {
     nginx ufw openssl cron logrotate
 
   if ! php -v 2>/dev/null | grep -qE "8\.(1|2|3)"; then
-    # Ubuntu 22.04/24.04: use Ondrej PPA (add-apt-repository method, reliable)
-    # Debian 12/13: use packages.sury.org direct repo
     mkdir -p /etc/apt/keyrings
-    if [[ "$OS" == "ubuntu" ]]; then
+    if [[ "$OS" == "ubuntu" && "$OS_VER" == "24.04" ]]; then
+      # Ubuntu 24.04 ships PHP 8.3 natively -- no extra repo needed
+      step "Using native Ubuntu 24.04 PHP 8.3 packages"
+      apt-get update -y
+    elif [[ "$OS" == "ubuntu" ]]; then
+      # Ubuntu 22.04: use ondrej/php PPA
       step "Adding PHP PPA (ondrej/php) for Ubuntu ${OS_VER}"
       apt-get install -y software-properties-common 2>/dev/null || true
       LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+      apt-get update -y
     else
+      # Debian 12/13: use packages.sury.org direct repo
       step "Adding PHP repository (Sury) for Debian ${OS_VER}"
       curl -fsSL https://packages.sury.org/php/apt.gpg \
         | gpg --dearmor -o /etc/apt/keyrings/sury-php.gpg
       echo "deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${OS_CODENAME} main" \
         > /etc/apt/sources.list.d/sury-php.list
+      apt-get update -y
     fi
-    apt-get update -y
   fi
 
   if   apt-cache show php8.3 &>/dev/null 2>&1; then PHP_VER="8.3"
