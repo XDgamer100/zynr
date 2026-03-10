@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # ================================================================
 #  Zynr.Cloud v5.1.1  --  Core: Colors * Helpers * Detection
 #  Sourced by install.sh; do not run directly.
